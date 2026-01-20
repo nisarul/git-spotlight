@@ -1,5 +1,7 @@
 # Git Spotlight
 
+[![VS Code Marketplace](https://img.shields.io/badge/VS%20Code-Marketplace-blue?logo=visualstudiocode)](https://marketplace.visualstudio.com/items?itemName=SyedNisarUlHaq.git-spotlight)
+
 A VS Code extension that visualizes Git blame information with intelligent line highlighting. Compare branches, spot changes by age, author, commit, or heatmap with ease.
 
 ![Git Spotlight Demo](https://raw.githubusercontent.com/nisarul/git-spotlight/main/images/highlight_by_age.gif)
