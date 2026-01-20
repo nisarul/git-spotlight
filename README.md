@@ -6,7 +6,7 @@ A VS Code extension that visualizes Git blame information with intelligent line 
 
 ## Features
 
-### 🔀 Highlight Branch Differences (NEW)
+### 🔀 Highlight Branch Differences
 Compare your current branch with another branch and highlight all lines that differ.
 - Command: `Git Spotlight: Highlight Branch Differences`
 - Shows lines changed since branches diverged
@@ -46,7 +46,7 @@ View detailed statistics about file contributors, commits, and activity.
 - Recent commits list
 - Activity timeline for the last 30 days
 
-### 🔤 Gutter Annotations (NEW in v3.0)
+### 🔤 Gutter Annotations
 Show author initials or indicators in the editor gutter alongside highlighting.
 - Command: `Git Spotlight: Toggle Gutter Annotations`
 - Modes: Author initials, colored dots, or age indicators
@@ -159,14 +159,6 @@ src/
     ├── fileUtils.ts      # File validation
     └── timeParser.ts     # Duration parsing
 ```
-
-## What's New in v3.0
-
-- **Heatmap Mode**: Gradient colors showing code age at a glance
-- **File Statistics Panel**: Detailed contributor and commit statistics
-- **Gutter Annotations**: Author initials alongside line highlighting
-- **Enhanced Navigation**: Status bar buttons with highlight count
-- **Improved Colors**: Cool blue/teal palette for better visibility
 
 ## Requirements
 
