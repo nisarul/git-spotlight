@@ -2,7 +2,7 @@
 
 A VS Code extension that visualizes Git blame information with intelligent line highlighting. Spot changes by age, author, commit, or heatmap with ease.
 
-![Git Spotlight Demo](images/highlight_by_age.gif)
+![Git Spotlight Demo](https://raw.githubusercontent.com/nisarul/git-spotlight/main/images/highlight_by_age.gif)
 
 ## Features
 

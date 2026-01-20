@@ -4,6 +4,7 @@
   "description": "Visualize Git blame with intelligent line highlighting - by age, author, commit, heatmap, or code review",
   "version": "3.0.0",
   "publisher": "SyedNisarUlHaq",
+  "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.85.0"
   },
@@ -213,7 +214,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/git-spotlight"
+    "url": "https://github.com/nisarul/git-spotlight"
   },
   "license": "MIT"
 }
