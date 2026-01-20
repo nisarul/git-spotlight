@@ -1,6 +1,6 @@
 # Git Spotlight
 
-A VS Code extension that visualizes Git blame information with intelligent line highlighting. Spot changes by age, author, commit, or heatmap with ease.
+A VS Code extension that visualizes Git blame information with intelligent line highlighting. Compare branches, spot changes by age, author, commit, or heatmap with ease.
 
 ![Git Spotlight Demo](https://raw.githubusercontent.com/nisarul/git-spotlight/main/images/highlight_by_age.gif)
 
@@ -112,7 +112,7 @@ npm run compile
 |---------|------|---------|-------------|
 | `gitSpotlight.duration` | string | `"30d"` | Default duration for age highlighting |
 | `gitSpotlight.enableUncommittedHighlight` | boolean | `true` | Show uncommitted lines |
-| `gitSpotlight.enableGutterAnnotations` | boolean | `false` | Show author initials in gutter |
+| `gitSpotlight.enableGutterAnnotations` | boolean | `true` | Show author initials in gutter |
 | `gitSpotlight.gutterDisplayMode` | string | `"initials"` | Gutter mode: `initials`, `dot`, or `age` |
 | `gitSpotlight.enhancedMinimapColors` | boolean | `true` | Enhanced overview ruler visibility |
 | `gitSpotlight.maxFileSizeKB` | number | `1024` | Max file size to process |

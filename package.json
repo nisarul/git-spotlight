@@ -1,8 +1,8 @@
 {
   "name": "git-spotlight",
   "displayName": "Git Spotlight",
-  "description": "Visualize Git blame with intelligent line highlighting - by age, author, commit, heatmap, or code review",
-  "version": "1.0.1",
+  "description": "Visualize Git blame with intelligent line highlighting - compare branches, highlight by age, author, commit, heatmap and more",
+  "version": "1.0.2",
   "publisher": "SyedNisarUlHaq",
   "icon": "images/icon.png",
   "engines": {
@@ -106,7 +106,7 @@
         },
         "gitSpotlight.enableGutterAnnotations": {
           "type": "boolean",
-          "default": false,
+          "default": true,
           "description": "Show author initials or indicators in the editor gutter"
         },
         "gitSpotlight.gutterDisplayMode": {
