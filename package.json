@@ -1,0 +1,219 @@
+{
+  "name": "git-spotlight",
+  "displayName": "Git Spotlight",
+  "description": "Visualize Git blame with intelligent line highlighting - by age, author, commit, heatmap, or code review",
+  "version": "3.0.0",
+  "publisher": "SyedNisarUlHaq",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "keywords": [
+    "git",
+    "blame",
+    "highlight",
+    "age",
+    "author",
+    "commit",
+    "history",
+    "visualization",
+    "spotlight",
+    "heatmap",
+    "code review",
+    "statistics"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "gitSpotlight.highlightByAge",
+        "title": "Git Spotlight: Highlight by Age"
+      },
+      {
+        "command": "gitSpotlight.highlightByAuthor",
+        "title": "Git Spotlight: Highlight All Authors"
+      },
+      {
+        "command": "gitSpotlight.highlightByCommit",
+        "title": "Git Spotlight: Highlight All Commits"
+      },
+      {
+        "command": "gitSpotlight.highlightSpecificAuthor",
+        "title": "Git Spotlight: Highlight Specific Author"
+      },
+      {
+        "command": "gitSpotlight.highlightSpecificCommit",
+        "title": "Git Spotlight: Highlight Specific Commit"
+      },
+      {
+        "command": "gitSpotlight.highlightHeatmap",
+        "title": "Git Spotlight: Toggle Heatmap Mode",
+        "icon": "$(flame)"
+      },
+
+      {
+        "command": "gitSpotlight.showStatistics",
+        "title": "Git Spotlight: Show File Statistics",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "gitSpotlight.toggleGutter",
+        "title": "Git Spotlight: Toggle Gutter Annotations"
+      },
+      {
+        "command": "gitSpotlight.clear",
+        "title": "Git Spotlight: Clear All Highlights"
+      },
+      {
+        "command": "gitSpotlight.goToNextHighlight",
+        "title": "Git Spotlight: Go to Next Highlight",
+        "icon": "$(arrow-down)"
+      },
+      {
+        "command": "gitSpotlight.goToPreviousHighlight",
+        "title": "Git Spotlight: Go to Previous Highlight",
+        "icon": "$(arrow-up)"
+      }
+    ],
+    "configuration": {
+      "title": "Git Spotlight",
+      "properties": {
+        "gitSpotlight.duration": {
+          "type": "string",
+          "default": "30d",
+          "description": "Default duration for age-based highlighting (e.g., 7d, 30d, 3m, 90d, or ISO date)"
+        },
+        "gitSpotlight.enableUncommittedHighlight": {
+          "type": "boolean",
+          "default": true,
+          "description": "Highlight uncommitted lines with a different style"
+        },
+        "gitSpotlight.enableGutterAnnotations": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show author initials or indicators in the editor gutter"
+        },
+        "gitSpotlight.gutterDisplayMode": {
+          "type": "string",
+          "default": "initials",
+          "enum": ["initials", "dot", "age"],
+          "enumDescriptions": [
+            "Show author initials (e.g., JD for John Doe)",
+            "Show colored dots for each author",
+            "Show relative age indicator"
+          ],
+          "description": "What to display in the gutter annotations"
+        },
+        "gitSpotlight.enhancedMinimapColors": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show enhanced colors in the minimap for better visibility"
+        },
+        "gitSpotlight.maxFileSizeKB": {
+          "type": "number",
+          "default": 1024,
+          "description": "Maximum file size in KB to process (default: 1MB)"
+        },
+        "gitSpotlight.ageHighlightColor": {
+          "type": "string",
+          "default": "rgba(70,130,180,0.3)",
+          "description": "Background color for age-based highlights (default: steel blue)"
+        },
+        "gitSpotlight.uncommittedHighlightColor": {
+          "type": "string",
+          "default": "rgba(180,80,80,0.25)",
+          "description": "Background color for uncommitted lines"
+        },
+        "gitSpotlight.uncommittedUnderlineColor": {
+          "type": "string",
+          "default": "rgba(180,80,80,0.6)",
+          "description": "Underline color for uncommitted lines"
+        },
+        "gitSpotlight.selectedHighlightColor": {
+          "type": "string",
+          "default": "rgba(64,224,208,0.3)",
+          "description": "Background color when highlighting a specific author or commit (default: turquoise)"
+        },
+
+        "gitSpotlight.gitTimeout": {
+          "type": "number",
+          "default": 5000,
+          "description": "Timeout for git commands in milliseconds"
+        },
+        "gitSpotlight.debounceDelay": {
+          "type": "number",
+          "default": 300,
+          "description": "Debounce delay in milliseconds"
+        },
+        "gitSpotlight.colorSaturation": {
+          "type": "number",
+          "default": 55,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Color saturation for author/commit colors (0-100)"
+        },
+        "gitSpotlight.colorLightness": {
+          "type": "number",
+          "default": 45,
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Color lightness for author/commit colors (0-100)"
+        },
+        "gitSpotlight.colorOpacity": {
+          "type": "number",
+          "default": 0.28,
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Opacity for highlight colors (0-1)"
+        }
+      }
+    },
+    "keybindings": [
+      {
+        "command": "gitSpotlight.goToNextHighlight",
+        "key": "alt+]",
+        "mac": "alt+]",
+        "when": "editorTextFocus"
+      },
+      {
+        "command": "gitSpotlight.goToPreviousHighlight",
+        "key": "alt+[",
+        "mac": "alt+[",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js",
+    "test:unit": "mocha --require ts-node/register 'src/test/unit/**/*.test.ts'"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "@vscode/test-electron": "^2.3.8",
+    "eslint": "^8.54.0",
+    "glob": "^10.3.10",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/git-spotlight"
+  },
+  "license": "MIT"
+}
