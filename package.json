@@ -2,7 +2,7 @@
   "name": "git-spotlight",
   "displayName": "Git Spotlight",
   "description": "Visualize Git blame with intelligent line highlighting - by age, author, commit, heatmap, or code review",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "publisher": "SyedNisarUlHaq",
   "icon": "images/icon.png",
   "engines": {
