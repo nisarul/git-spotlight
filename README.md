@@ -6,34 +6,40 @@ A VS Code extension that visualizes Git blame information with intelligent line 
 
 ## Features
 
-### 🕐 Highlight by Age
-Highlight lines modified within a specified time duration.
-- Command: `Git Spotlight: Highlight by Age`
-- Enter duration: `7d`, `30d`, `3m`, `1y`, or ISO date
+### 🔀 Highlight Branch Differences (NEW)
+Compare your current branch with another branch and highlight all lines that differ.
+- Command: `Git Spotlight: Highlight Branch Differences`
+- Shows lines changed since branches diverged
+- Great for code reviews and understanding PR changes
 
-### 👤 Highlight by Author
-Color-code lines by author - each author gets a unique, consistent color.
-- Command: `Git Spotlight: Highlight All Authors`
-
-### 📝 Highlight by Commit
-Color-code lines by commit - each commit gets a unique color.
-- Command: `Git Spotlight: Highlight All Commits`
-
-### 🎯 Highlight Specific Author
-Select and highlight only a specific author's changes.
-- Command: `Git Spotlight: Highlight Specific Author`
-
-### 🔍 Highlight Specific Commit
-Select and highlight only a specific commit's changes.
-- Command: `Git Spotlight: Highlight Specific Commit`
-
-### 🔥 Heatmap Mode (NEW in v3.0)
+### 🔥 Heatmap Mode
 Visualize code age with a gradient heatmap - newer code appears in warmer colors, older code in cooler colors.
 - Command: `Git Spotlight: Heatmap Mode`
 - 20-level color gradient from blue (oldest) to teal (newest)
 - Great for identifying recently modified vs. stable code
 
-###  File Statistics (NEW in v3.0)
+### 🕐 Highlight by Age
+Highlight lines modified within a specified time duration.
+- Command: `Git Spotlight: Highlight by Age`
+- Enter duration: `7d`, `30d`, `3m`, `1y`, or ISO date
+
+### 🔍 Highlight Specific Commit
+Select and highlight only a specific commit's changes.
+- Command: `Git Spotlight: Highlight Specific Commit`
+
+### 🎯 Highlight Specific Author
+Select and highlight only a specific author's changes.
+- Command: `Git Spotlight: Highlight Specific Author`
+
+### 📝 Highlight by Commit
+Color-code lines by commit - each commit gets a unique color.
+- Command: `Git Spotlight: Highlight All Commits`
+
+### 👤 Highlight by Author
+Color-code lines by author - each author gets a unique, consistent color.
+- Command: `Git Spotlight: Highlight All Authors`
+
+### 📊 File Statistics
 View detailed statistics about file contributors, commits, and activity.
 - Command: `Git Spotlight: Show File Statistics`
 - Author contribution breakdown with percentages
@@ -87,12 +93,13 @@ npm run compile
 
 | Command | Description | Shortcut |
 |---------|-------------|----------|
-| `Git Spotlight: Highlight by Age` | Highlight recently modified lines | |
-| `Git Spotlight: Highlight All Authors` | Color-code by author | |
-| `Git Spotlight: Highlight All Commits` | Color-code by commit | |
-| `Git Spotlight: Highlight Specific Author` | Highlight one author's changes | |
-| `Git Spotlight: Highlight Specific Commit` | Highlight one commit's changes | |
+| `Git Spotlight: Highlight Branch Differences` | Compare with another branch | |
 | `Git Spotlight: Heatmap Mode` | Gradient by code age | |
+| `Git Spotlight: Highlight by Age` | Highlight recently modified lines | |
+| `Git Spotlight: Highlight Specific Commit` | Highlight one commit's changes | |
+| `Git Spotlight: Highlight Specific Author` | Highlight one author's changes | |
+| `Git Spotlight: Highlight All Commits` | Color-code by commit | |
+| `Git Spotlight: Highlight All Authors` | Color-code by author | |
 | `Git Spotlight: Show File Statistics` | Show contributor stats panel | |
 | `Git Spotlight: Toggle Gutter Annotations` | Toggle gutter initials/dots | |
 | `Git Spotlight: Go to Next Highlight` | Navigate to next highlight | `Alt+]` |

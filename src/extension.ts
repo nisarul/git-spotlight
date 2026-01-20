@@ -9,7 +9,7 @@
 
 import * as vscode from 'vscode';
 import { getSettings, onSettingsChanged, ExtensionSettings } from './config/settings';
-import { getRepoInfo, getBlame, getHeadCommit, isFileTracked, GitRepoInfo, getRemoteUrl } from './blame/gitRunner';
+import { getRepoInfo, getBlame, getHeadCommit, isFileTracked, GitRepoInfo, getRemoteUrl, getBranches, getDiffLines } from './blame/gitRunner';
 import { parseBlameOutput, filterLinesByTime, getUncommittedLines, BlameParseResult } from './blame/blameParser';
 import { getBlameCache, BlameCache } from './blame/blameCache';
 import { LineDecorator, createLineDecorator, HighlightMode } from './highlight/decorator';
@@ -37,6 +37,9 @@ class GitSpotlightExtension {
 
     /** Selected commit for specific commit mode */
     private selectedCommit: string | undefined;
+
+    /** Selected branch for branch diff mode */
+    private selectedBranch: string | undefined;
 
     /** Extension settings */
     private settings: ExtensionSettings;
@@ -428,6 +431,135 @@ class GitSpotlightExtension {
     }
 
     /**
+     * Highlight branch differences - shows lines that actually differ from a selected branch
+     * Uses git diff to find real differences, not commit-based comparison
+     */
+    async highlightBranchDiff(): Promise<void> {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showWarningMessage('No active editor');
+            return;
+        }
+
+        const uri = editor.document.uri;
+        if (uri.scheme !== 'file') {
+            vscode.window.showWarningMessage('This command only works with local files.');
+            return;
+        }
+
+        // Get repo info
+        const repoInfo = await getRepoInfo(uri.fsPath, this.settings.gitTimeout);
+        if (!repoInfo.isRepository || !repoInfo.repoRoot) {
+            vscode.window.showWarningMessage('File is not in a Git repository.');
+            return;
+        }
+
+        // Get list of branches
+        const branches = await getBranches(repoInfo.repoRoot, this.settings.gitTimeout);
+        if (branches.length === 0) {
+            vscode.window.showWarningMessage('No branches found in the repository.');
+            return;
+        }
+
+        // Filter to only remote branches (exclude local branches and origin/HEAD)
+        const remoteBranches = branches
+            .filter(b => b.startsWith('origin/') && b !== 'origin/HEAD')
+            .sort();
+        
+        if (remoteBranches.length === 0) {
+            vscode.window.showWarningMessage('No remote branches found. Try fetching from remote first.');
+            return;
+        }
+
+        // Show branch picker
+        const selected = await vscode.window.showQuickPick(remoteBranches, {
+            placeHolder: 'Select a remote branch to compare against',
+            title: 'Git Spotlight: Compare with Remote Branch',
+        });
+
+        if (!selected) {
+            return;
+        }
+
+        this.selectedBranch = selected;
+        this.mode = 'branchDiff';
+        this.updateStatusBar();
+        await this.refreshActiveEditor();
+    }
+
+    /**
+     * Open side-by-side diff view comparing current file with a remote branch
+     */
+    async diffWithBranch(): Promise<void> {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            vscode.window.showWarningMessage('No active editor');
+            return;
+        }
+
+        const uri = editor.document.uri;
+        if (uri.scheme !== 'file') {
+            vscode.window.showWarningMessage('This command only works with local files.');
+            return;
+        }
+
+        // Get repo info
+        const repoInfo = await getRepoInfo(uri.fsPath, this.settings.gitTimeout);
+        if (!repoInfo.isRepository || !repoInfo.repoRoot) {
+            vscode.window.showWarningMessage('File is not in a Git repository.');
+            return;
+        }
+
+        // Get list of remote branches
+        const branches = await getBranches(repoInfo.repoRoot, this.settings.gitTimeout);
+        const remoteBranches = branches
+            .filter(b => b.startsWith('origin/') && b !== 'origin/HEAD')
+            .sort();
+        
+        if (remoteBranches.length === 0) {
+            vscode.window.showWarningMessage('No remote branches found. Try fetching from remote first.');
+            return;
+        }
+
+        // Show branch picker
+        const selected = await vscode.window.showQuickPick(remoteBranches, {
+            placeHolder: 'Select a remote branch to compare against',
+            title: 'Git Spotlight: Diff with Remote Branch',
+        });
+
+        if (!selected) {
+            return;
+        }
+
+        // Get relative path from repo root
+        const relativePath = uri.fsPath.substring(repoInfo.repoRoot.length + 1);
+        const fileName = uri.fsPath.split('/').pop() || 'file';
+
+        // Create a git URI for the file at the selected branch
+        // VS Code's built-in git extension uses this URI scheme
+        const gitUri = vscode.Uri.parse(`git:/${relativePath}?${encodeURIComponent(JSON.stringify({ path: uri.fsPath, ref: selected }))}`);
+
+        // Try using VS Code's built-in git extension first
+        try {
+            await vscode.commands.executeCommand(
+                'vscode.diff',
+                gitUri,
+                uri,
+                `${fileName} (${selected}) ↔ ${fileName} (Working Tree)`
+            );
+        } catch {
+            // Fallback: Try the git extension's diff command
+            try {
+                await vscode.commands.executeCommand('git.openChange', uri);
+            } catch {
+                vscode.window.showErrorMessage(
+                    'Unable to open diff view. Make sure the Git extension is enabled.'
+                );
+            }
+        }
+    }
+
+    /**
      * Show file statistics panel
      */
     async showStatistics(): Promise<void> {
@@ -608,6 +740,31 @@ class GitSpotlightExtension {
                 case 'heatmap':
                     this.decorator.applyHeatmapHighlighting(editor, blameResult, uncommittedLines);
                     break;
+                case 'branchDiff':
+                    if (this.selectedBranch) {
+                        // Use git diff to find actual line differences
+                        const diffLines = await getDiffLines(
+                            uri.fsPath,
+                            repoRoot,
+                            this.selectedBranch,
+                            this.settings.gitTimeout
+                        );
+                        this.decorator.applyBranchDiffHighlighting(editor, blameResult, diffLines.addedLines);
+                        
+                        const lineCount = diffLines.addedLines.length;
+                        if (lineCount > 0) {
+                            vscode.window.setStatusBarMessage(
+                                `${lineCount} line${lineCount !== 1 ? 's' : ''} differ from "${this.selectedBranch}"`,
+                                3000
+                            );
+                        } else {
+                            vscode.window.setStatusBarMessage(
+                                `No differences from "${this.selectedBranch}" in this file`,
+                                3000
+                            );
+                        }
+                    }
+                    break;
             }
 
             // Apply gutter annotations if enabled
@@ -676,6 +833,10 @@ class GitSpotlightExtension {
                 this.statusBarItem.text = '$(flame) Heatmap';
                 this.statusBarItem.tooltip = 'Click to clear highlights';
                 break;
+            case 'branchDiff':
+                this.statusBarItem.text = `$(git-compare) vs ${this.selectedBranch}`;
+                this.statusBarItem.tooltip = 'Click to clear highlights';
+                break;
         }
     }
 
@@ -712,6 +873,8 @@ export function activate(context: vscode.ExtensionContext): void {
         vscode.commands.registerCommand('gitSpotlight.highlightByCommit', () => extension?.highlightByCommit()),
         vscode.commands.registerCommand('gitSpotlight.highlightSpecificAuthor', () => extension?.highlightSpecificAuthor()),
         vscode.commands.registerCommand('gitSpotlight.highlightSpecificCommit', () => extension?.highlightSpecificCommit()),
+        vscode.commands.registerCommand('gitSpotlight.highlightBranchDiff', () => extension?.highlightBranchDiff()),
+        vscode.commands.registerCommand('gitSpotlight.diffWithBranch', () => extension?.diffWithBranch()),
         vscode.commands.registerCommand('gitSpotlight.highlightHeatmap', () => extension?.highlightHeatmap()),
         vscode.commands.registerCommand('gitSpotlight.showStatistics', () => extension?.showStatistics()),
         vscode.commands.registerCommand('gitSpotlight.toggleGutter', () => extension?.toggleGutter()),

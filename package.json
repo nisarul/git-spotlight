@@ -2,7 +2,7 @@
   "name": "git-spotlight",
   "displayName": "Git Spotlight",
   "description": "Visualize Git blame with intelligent line highlighting - by age, author, commit, heatmap, or code review",
-  "version": "3.0.1",
+  "version": "1.0.0",
   "publisher": "SyedNisarUlHaq",
   "icon": "images/icon.png",
   "engines": {
@@ -33,31 +33,40 @@
   "contributes": {
     "commands": [
       {
-        "command": "gitSpotlight.highlightByAge",
-        "title": "Git Spotlight: Highlight by Age"
+        "command": "gitSpotlight.highlightBranchDiff",
+        "title": "Git Spotlight: Highlight Branch Differences",
+        "icon": "$(git-compare)"
       },
       {
-        "command": "gitSpotlight.highlightByAuthor",
-        "title": "Git Spotlight: Highlight All Authors"
-      },
-      {
-        "command": "gitSpotlight.highlightByCommit",
-        "title": "Git Spotlight: Highlight All Commits"
-      },
-      {
-        "command": "gitSpotlight.highlightSpecificAuthor",
-        "title": "Git Spotlight: Highlight Specific Author"
-      },
-      {
-        "command": "gitSpotlight.highlightSpecificCommit",
-        "title": "Git Spotlight: Highlight Specific Commit"
+        "command": "gitSpotlight.diffWithBranch",
+        "title": "Git Spotlight: Diff with Branch (Side-by-Side)",
+        "icon": "$(diff)"
       },
       {
         "command": "gitSpotlight.highlightHeatmap",
         "title": "Git Spotlight: Toggle Heatmap Mode",
         "icon": "$(flame)"
       },
-
+      {
+        "command": "gitSpotlight.highlightByAge",
+        "title": "Git Spotlight: Highlight by Age"
+      },
+      {
+        "command": "gitSpotlight.highlightSpecificCommit",
+        "title": "Git Spotlight: Highlight Specific Commit"
+      },
+      {
+        "command": "gitSpotlight.highlightSpecificAuthor",
+        "title": "Git Spotlight: Highlight Specific Author"
+      },
+      {
+        "command": "gitSpotlight.highlightByCommit",
+        "title": "Git Spotlight: Highlight All Commits"
+      },
+      {
+        "command": "gitSpotlight.highlightByAuthor",
+        "title": "Git Spotlight: Highlight All Authors"
+      },
       {
         "command": "gitSpotlight.showStatistics",
         "title": "Git Spotlight: Show File Statistics",

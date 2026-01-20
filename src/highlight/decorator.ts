@@ -23,7 +23,8 @@ export type HighlightMode =
     | 'commit'
     | 'heatmap'
     | 'specificAuthor'
-    | 'specificCommit';
+    | 'specificCommit'
+    | 'branchDiff';
 
 /**
  * Decoration range with hover content
@@ -502,6 +503,28 @@ export class LineDecorator {
             );
             editor.setDecorations(this.uncommittedDecoration, uncommittedDecorations);
         }
+    }
+
+    /**
+     * Apply branch diff highlighting - highlights lines that actually differ from another branch
+     * Uses line numbers from git diff, not commit-based comparison
+     * @param diffLines - Array of 1-based line numbers that differ
+     */
+    applyBranchDiffHighlighting(
+        editor: vscode.TextEditor,
+        blameResult: BlameParseResult,
+        diffLines: number[]
+    ): void {
+        this.clearAllFromEditor(editor);
+
+        this.highlightedLines = [...diffLines].sort((a, b) => a - b);
+
+        const decorations = this.createDecorationRanges(
+            editor.document,
+            diffLines,
+            blameResult
+        );
+        editor.setDecorations(this.reviewDecoration, decorations);
     }
 
     /**

@@ -441,3 +441,80 @@ export function getCommitUrl(remoteUrl: string, commitSha: string): string | und
 
     return webUrl;
 }
+
+/**
+ * Result of parsing diff for changed lines
+ */
+export interface DiffChangedLines {
+    /** Line numbers that were added or modified in the current version */
+    addedLines: number[];
+    /** Line numbers that were deleted (not in current version, but useful for context) */
+    deletedLineRanges: Array<{ afterLine: number; count: number }>;
+}
+
+/**
+ * Get the line numbers that differ between the current file and a branch
+ * Uses git diff to find actual differences, not commit-based comparison
+ * 
+ * @param filePath - Path to the file
+ * @param repoRoot - Repository root path
+ * @param branch - Branch to compare against
+ * @param timeout - Command timeout
+ * @returns Line numbers that are different in the current version
+ */
+export async function getDiffLines(
+    filePath: string,
+    repoRoot: string,
+    branch: string,
+    timeout: number = DEFAULT_TIMEOUT
+): Promise<DiffChangedLines> {
+    const result: DiffChangedLines = {
+        addedLines: [],
+        deletedLineRanges: []
+    };
+
+    // Get relative path from repo root
+    const relativePath = path.relative(repoRoot, filePath);
+
+    // Use git diff with three-dot syntax to compare changes since merge-base
+    // This shows only changes in HEAD that aren't in the target branch
+    // (same as what Azure DevOps/GitHub PR diff shows)
+    // The -U0 flag gives us minimal context (just the changed lines)
+    const diffResult = await runGitCommand(
+        ['diff', '-U0', `${branch}...HEAD`, '--', relativePath],
+        { cwd: repoRoot, timeout }
+    );
+
+    if (!diffResult.success || !diffResult.stdout) {
+        return result;
+    }
+
+    // Parse the unified diff output to extract line numbers
+    // Format: @@ -startOld,countOld +startNew,countNew @@
+    const hunkHeaderRegex = /^@@\s+-(\d+)(?:,(\d+))?\s+\+(\d+)(?:,(\d+))?\s+@@/gm;
+    let match;
+
+    while ((match = hunkHeaderRegex.exec(diffResult.stdout)) !== null) {
+        const oldCount = match[2] ? parseInt(match[2], 10) : 1;
+        const newStart = parseInt(match[3], 10);
+        const newCount = match[4] ? parseInt(match[4], 10) : 1;
+
+        // Lines added or modified in the new version
+        if (newCount > 0) {
+            for (let i = 0; i < newCount; i++) {
+                result.addedLines.push(newStart + i);
+            }
+        }
+
+        // Track deleted lines (lines that existed in branch but not in HEAD)
+        if (oldCount > 0 && newCount === 0) {
+            result.deletedLineRanges.push({
+                afterLine: newStart,
+                count: oldCount
+            });
+        }
+    }
+
+    return result;
+}
+
