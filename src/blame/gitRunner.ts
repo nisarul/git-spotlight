@@ -476,12 +476,12 @@ export async function getDiffLines(
     // Get relative path from repo root
     const relativePath = path.relative(repoRoot, filePath);
 
-    // Use git diff with three-dot syntax to compare changes since merge-base
-    // This shows only changes in HEAD that aren't in the target branch
+    // Use git diff to compare changes since merge-base
+    // This shows only changes in working tree that aren't in the target branch
     // (same as what Azure DevOps/GitHub PR diff shows)
     // The -U0 flag gives us minimal context (just the changed lines)
     const diffResult = await runGitCommand(
-        ['diff', '-U0', `${branch}...HEAD`, '--', relativePath],
+        ['diff', '-U0', branch, '--', relativePath],
         { cwd: repoRoot, timeout }
     );
 
